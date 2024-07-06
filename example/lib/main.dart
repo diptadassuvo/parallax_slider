@@ -43,8 +43,22 @@ class ExamplePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: ParallaxSlider(),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          ParallaxSlider(
+            imageType: ParallaxSliderImageType.NETWORK,
+            imagePaths: [
+              "https://img.freepik.com/free-photo/beautiful-mountains-landscape_23-2150787826.jpg",
+              "https://img.freepik.com/free-photo/high-angle-shot-brown-rock-formation-lot-parked-cars-blue-sky-evening_181624-4980.jpg",
+              "https://img.freepik.com/free-photo/landscape-morning-fog-mountains-sunrise_335224-793.jpg",
+              "https://img.freepik.com/free-photo/beautiful-mountains-landscape_23-2150787970.jpg"
+            ],
+            height: 100,
+            spaceBetweenItems: 20,
+          ),
+        ],
       ),
     );
   }
