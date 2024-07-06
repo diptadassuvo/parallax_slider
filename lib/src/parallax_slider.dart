@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
 
-List<String> demoData = [
-  "https://img.freepik.com/free-photo/beautiful-mountains-landscape_23-2150787826.jpg",
-  "https://img.freepik.com/free-photo/abstract-colorful-background_23-2150787824.jpg",
-  "https://img.freepik.com/free-photo/beautiful-mountains-landscape_23-2150787826.jpg",
-  "https://img.freepik.com/free-photo/abstract-colorful-background_23-2150787824.jpg",
-  "https://img.freepik.com/free-photo/beautiful-mountains-landscape_23-2150787826.jpg",
-  "https://img.freepik.com/free-photo/abstract-colorful-background_23-2150787824.jpg",
-];
-
 class ParallaxSlider extends StatefulWidget {
-  const ParallaxSlider({super.key});
+  const ParallaxSlider({
+    required this.imageType,
+    required this.imagePaths,
+    super.key,
+    this.height,
+    this.spaceBetweenItems,
+    this.borderRadius,
+  });
+
+  final double? height;
+  final double? spaceBetweenItems;
+  final BorderRadius? borderRadius;
+  final ParallaxSliderImageType imageType;
+  final List<String> imagePaths;
 
   @override
   State<ParallaxSlider> createState() => _ParallaxSliderState();
@@ -23,7 +27,9 @@ class _ParallaxSliderState extends State<ParallaxSlider> {
   @override
   void initState() {
     super.initState();
-    _pageController = PageController(viewportFraction: 0.7);
+    final viewportFraction =
+        widget.height ?? 300 / MediaQuery.sizeOf(context).width;
+    _pageController = PageController(viewportFraction: viewportFraction);
     _pageController.addListener(() {
       setState(() {
         _pageOffset = _pageController.page!;
@@ -34,25 +40,33 @@ class _ParallaxSliderState extends State<ParallaxSlider> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 300,
+      height: widget.height ?? 300,
       child: PageView.builder(
-          itemCount: demoData.length,
+          itemCount: widget.imagePaths.length,
           controller: _pageController,
           itemBuilder: (context, index) {
             return Transform.scale(
               scale: 1,
               child: Container(
                 padding: EdgeInsets.only(
-                  right: index != demoData.length - 1 ? 20 : 0,
+                  right: index != widget.imagePaths.length - 1
+                      ? widget.spaceBetweenItems ?? 20
+                      : 0,
                 ),
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(15),
-                  child: Image.network(
-                    demoData[index],
-                    height: 370,
-                    fit: BoxFit.cover,
-                    alignment: Alignment(-_pageOffset.abs() + index, 0),
-                  ),
+                  borderRadius:
+                      widget.borderRadius ?? BorderRadius.circular(15),
+                  child: widget.imageType == ParallaxSliderImageType.NETWORK
+                      ? Image.network(
+                          widget.imagePaths[index],
+                          fit: BoxFit.cover,
+                          alignment: Alignment(-_pageOffset.abs() + index, 0),
+                        )
+                      : Image.asset(
+                          widget.imagePaths[index],
+                          fit: BoxFit.cover,
+                          alignment: Alignment(-_pageOffset.abs() + index, 0),
+                        ),
                 ),
               ),
             );
@@ -60,3 +74,5 @@ class _ParallaxSliderState extends State<ParallaxSlider> {
     );
   }
 }
+
+enum ParallaxSliderImageType { ASSETS, NETWORK }
