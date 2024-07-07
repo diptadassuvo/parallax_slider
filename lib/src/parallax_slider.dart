@@ -21,26 +21,51 @@ class ParallaxSlider extends StatefulWidget {
 }
 
 class _ParallaxSliderState extends State<ParallaxSlider> {
-  late final PageController _pageController;
+  late PageController _pageController;
   double _pageOffset = 0;
 
   @override
   void initState() {
     super.initState();
-    final viewportFraction =
-        widget.height ?? 300 / MediaQuery.sizeOf(context).width;
+    _initializePageController();
+  }
+
+  void _initializePageController() {
+    final viewportFraction = (widget.height ?? 300) * 0.7 / 300;
     _pageController = PageController(viewportFraction: viewportFraction);
     _pageController.addListener(() {
-      setState(() {
-        _pageOffset = _pageController.page!;
-      });
+      if (mounted) {
+        setState(() {
+          _pageOffset = _pageController.page!;
+        });
+      }
     });
+  }
+
+  void _disposePageController() {
+    _pageController.dispose();
+  }
+
+  @override
+  void didUpdateWidget(covariant ParallaxSlider oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.height != widget.height) {
+      _disposePageController();
+      _initializePageController();
+    }
+  }
+
+  @override
+  void dispose() {
+    _disposePageController();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       height: widget.height ?? 300,
+      width: double.infinity,
       child: PageView.builder(
           itemCount: widget.imagePaths.length,
           controller: _pageController,
@@ -60,6 +85,7 @@ class _ParallaxSliderState extends State<ParallaxSlider> {
                       ? Image.network(
                           widget.imagePaths[index],
                           fit: BoxFit.cover,
+                          width: widget.height,
                           alignment: Alignment(-_pageOffset.abs() + index, 0),
                         )
                       : Image.asset(
